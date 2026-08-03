@@ -1,0 +1,135 @@
+"use client";
+
+import { useState } from "react";
+import MediaSlot from "@/components/MediaSlot";
+import {
+  morningMoment,
+  pickAfternoonMoment,
+  todayLabel,
+  type Moment,
+} from "@/lib/moments";
+
+type Period = "morning" | "afternoon";
+
+type MainViewProps = {
+  onOpenFeedback: () => void;
+  onBack: () => void;
+};
+
+export default function MainView({
+  onOpenFeedback,
+  onBack,
+}: MainViewProps) {
+  const [period, setPeriod] = useState<Period>("morning");
+  const [afternoon, setAfternoon] = useState<Moment>(() => pickAfternoonMoment());
+
+  const moment = period === "morning" ? morningMoment : afternoon;
+  const label = period === "morning" ? "오전" : "오후";
+
+  function goAfternoon() {
+    setAfternoon((current) => pickAfternoonMoment(current.id));
+    setPeriod("afternoon");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function goMorning() {
+    setPeriod("morning");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  return (
+    <section className="main-view" aria-label="야쿤이의 하루 알림장">
+      <div className="diary-wrap">
+        <button type="button" className="diary-back" onClick={onBack}>
+          ← 뒤로가기
+        </button>
+
+        <article className="diary-sheet fade-in-slow" key={period}>
+          <header className="diary-header">
+            <p className="diary-brand">야쿤이별</p>
+            <h2 className="diary-title">야쿤이의 하루 알림장</h2>
+            <p className="diary-date">{todayLabel()}</p>
+            <p className="diary-upload-note">알림장은 오후 9시에 업로드됩니다</p>
+          </header>
+
+          <section className="diary-section">
+            <div className="diary-label">
+              <span
+                className={`diary-dot ${period === "afternoon" ? "is-now" : ""}`}
+                aria-hidden="true"
+              />
+              {label}
+            </div>
+            <p className="diary-text">{moment.text}</p>
+
+            <MediaSlot
+              candidates={moment.candidates}
+              fallback={moment.fallback}
+              alt={`야쿤이 — ${moment.text}`}
+            />
+
+            <p className="diary-caption">{moment.caption}</p>
+          </section>
+
+          <footer className="diary-footer">
+            {period === "morning" ? (
+              <>
+                <p className="hint">오후의 야쿤이도 보고 싶다면</p>
+                <button
+                  type="button"
+                  className="paw-btn"
+                  onClick={goAfternoon}
+                  aria-label="오후 활동 보기"
+                >
+                  <PawIcon />
+                  <span>다른 활동 보기</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="hint">오전으로 돌아가거나, 다른 오후를 볼 수 있어요</p>
+                <button
+                  type="button"
+                  className="paw-btn"
+                  onClick={goAfternoon}
+                  aria-label="다른 오후 활동 보기"
+                >
+                  <PawIcon />
+                  <span>다른 활동 보기</span>
+                </button>
+                <button type="button" className="ghost-btn" onClick={goMorning}>
+                  오전 알림장으로
+                </button>
+              </>
+            )}
+
+            <div className="action-links">
+              <button
+                type="button"
+                className="ghost-btn"
+                onClick={onOpenFeedback}
+              >
+                궁금한 점 남기기
+              </button>
+            </div>
+          </footer>
+        </article>
+      </div>
+    </section>
+  );
+}
+
+function PawIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+      <ellipse cx="7" cy="7.5" rx="2.2" ry="2.8" fill="currentColor" opacity="0.85" />
+      <ellipse cx="12" cy="5.2" rx="2.2" ry="2.8" fill="currentColor" opacity="0.85" />
+      <ellipse cx="17" cy="7.5" rx="2.2" ry="2.8" fill="currentColor" opacity="0.85" />
+      <ellipse cx="9.2" cy="11.2" rx="1.6" ry="2" fill="currentColor" opacity="0.75" />
+      <path
+        fill="currentColor"
+        d="M12 22c-3.4 0-5.8-2.2-5.8-4.8 0-2.2 1.7-3.7 3.4-4.4.5 1.2 1.4 2 2.4 2s1.9-.8 2.4-2c1.7.7 3.4 2.2 3.4 4.4C17.8 19.8 15.4 22 12 22z"
+      />
+    </svg>
+  );
+}
