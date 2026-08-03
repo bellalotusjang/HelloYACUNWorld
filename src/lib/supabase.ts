@@ -1,0 +1,41 @@
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+
+export type FeedbackRow = {
+  id: string;
+  topic: string;
+  message: string;
+  name: string;
+  created_at: string;
+};
+
+function requiredEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`${name} 환경변수가 없습니다.`);
+  }
+  return value;
+}
+
+export function getServiceSupabase(): SupabaseClient {
+  const url = requiredEnv("NEXT_PUBLIC_SUPABASE_URL");
+  const key = requiredEnv("SUPABASE_SERVICE_ROLE_KEY");
+  return createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
+
+export function getAnonSupabase(): SupabaseClient {
+  const url = requiredEnv("NEXT_PUBLIC_SUPABASE_URL");
+  const key = requiredEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+  return createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
+
+export function isSupabaseConfigured(): boolean {
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
+      process.env.SUPABASE_SERVICE_ROLE_KEY,
+  );
+}

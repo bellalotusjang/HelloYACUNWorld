@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { curiosityTopics, siteConfig, type CuriosityTopicId } from "@/lib/site";
+import { curiosityTopics, type CuriosityTopicId } from "@/lib/site";
 
 type FeedbackViewProps = {
   onBack: () => void;
@@ -14,6 +14,7 @@ export default function FeedbackView({ onBack }: FeedbackViewProps) {
   const [message, setMessage] = useState("");
   const [name, setName] = useState("");
   const [status, setStatus] = useState<Status>("idle");
+  const [errorText, setErrorText] = useState("");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -21,51 +22,37 @@ export default function FeedbackView({ onBack }: FeedbackViewProps) {
 
     const topicLabel =
       curiosityTopics.find((item) => item.id === topic)?.label ?? topic;
-    const payload = {
-      topic: topicLabel,
-      message: message.trim(),
-      name: name.trim() || "익명",
-      submittedAt: new Date().toISOString(),
-    };
 
     setStatus("sending");
+    setErrorText("");
 
     try {
-      if (siteConfig.formspreeId) {
-        const res = await fetch(
-          `https://formspree.io/f/${siteConfig.formspreeId}`,
-          {
-            method: "POST",
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              topic: payload.topic,
-              message: payload.message,
-              name: payload.name,
-              _subject: `[야쿤이별 의견함] ${payload.topic}`,
-            }),
-          },
-        );
-        if (!res.ok) throw new Error("formspree failed");
-      } else {
-        const body = [
-          `주제: ${payload.topic}`,
-          `닉네임: ${payload.name}`,
-          "",
-          payload.message,
-        ].join("\n");
-        const mailto = `mailto:${encodeURIComponent(siteConfig.adminEmail)}?subject=${encodeURIComponent(`[야쿤이별 의견함] ${payload.topic}`)}&body=${encodeURIComponent(body)}`;
-        window.location.href = mailto;
+      const res = await fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          topic: topicLabel,
+          message: message.trim(),
+          name: name.trim() || "익명",
+        }),
+      });
+
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        throw new Error(data.error ?? "전송 실패");
       }
 
       setStatus("sent");
       setMessage("");
       setName("");
       setTopic("");
-    } catch {
+    } catch (err) {
       setStatus("error");
+      setErrorText(
+        err instanceof Error
+          ? err.message
+          : "전달에 잠시 문제가 생겼어요. 조금 뒤 다시 시도해 주세요.",
+      );
     }
   }
 
@@ -81,7 +68,7 @@ export default function FeedbackView({ onBack }: FeedbackViewProps) {
           <h2>의견함</h2>
           <p className="feedback-lead">
             야쿤이에 대해 더 궁금한 점이나, 전하고 싶은 마음이 있다면 남겨
-            주세요. 강아지별 관리자에게 전달됩니다.
+            주세요. 관리자 페이지에서 확인할 수 있어요.
           </p>
         </header>
 
@@ -144,7 +131,8 @@ export default function FeedbackView({ onBack }: FeedbackViewProps) {
 
             {status === "error" && (
               <p className="feedback-error" role="alert">
-                전달에 잠시 문제가 생겼어요. 조금 뒤 다시 시도해 주세요.
+                {errorText ||
+                  "전달에 잠시 문제가 생겼어요. 조금 뒤 다시 시도해 주세요."}
               </p>
             )}
 

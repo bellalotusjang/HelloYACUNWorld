@@ -1,14 +1,3 @@
-export const siteConfig = {
-  /** 의견함 메일 수신 주소 — 본인 이메일로 바꿔주세요 */
-  adminEmail: "bellalotusjang@gmail.com",
-  /**
-   * Formspree 폼 ID가 있으면 메일이 자동 전송됩니다.
-   * https://formspree.io 에서 폼 생성 후 ID를 넣고,
-   * .env.local 에 NEXT_PUBLIC_FORMSPREE_ID=xxxx 로 설정하세요.
-   */
-  formspreeId: process.env.NEXT_PUBLIC_FORMSPREE_ID ?? "",
-};
-
 export const curiosityTopics = [
   { id: "treats", label: "야쿤이가 좋아하던 간식·장난감" },
   { id: "memories", label: "야쿤이와의 특별한 추억" },
