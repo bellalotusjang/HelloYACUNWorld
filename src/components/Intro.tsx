@@ -27,7 +27,7 @@ export default function Intro({ onEnter }: IntroProps) {
 
         <h1 className="poster-title fade-up" style={{ animationDelay: "0.4s" }}>
           <span className="poster-line cream">야쿤이</span>
-          <span className="poster-line brown">별✨</span>
+          <span className="poster-line brown">별</span>
         </h1>
 
         <p
