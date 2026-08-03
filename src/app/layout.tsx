@@ -17,9 +17,9 @@ export const metadata: Metadata = {
     siteName: "야쿤이별",
     images: [
       {
-        url: `${siteUrl}/images/og-kakao.jpg`,
+        url: `${siteUrl}/images/og-share.jpg`,
         width: 1024,
-        height: 670,
+        height: 764,
         alt: "야쿤이별",
       },
     ],
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "야쿤이별",
     description: "야쿤이를 기억하는 작은 별자리",
-    images: [`${siteUrl}/images/og-kakao.jpg`],
+    images: [`${siteUrl}/images/og-share.jpg`],
   },
 };
 
