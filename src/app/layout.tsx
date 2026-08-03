@@ -18,8 +18,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: `${siteUrl}/images/og.jpg`,
-        width: 1024,
-        height: 670,
+        width: 1536,
+        height: 1024,
         alt: "야쿤이별",
       },
     ],
