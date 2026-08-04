@@ -9,17 +9,24 @@ type LetterViewProps = {
 
 export default function LetterView({ onBack }: LetterViewProps) {
   const [visibleCount, setVisibleCount] = useState(0);
+  const [unfolded, setUnfolded] = useState(false);
   const done = visibleCount >= letterLines.length;
 
   useEffect(() => {
+    const open = window.setTimeout(() => setUnfolded(true), 80);
+    return () => window.clearTimeout(open);
+  }, []);
+
+  useEffect(() => {
+    if (!unfolded) return;
     if (visibleCount >= letterLines.length) return;
     const line = letterLines[visibleCount];
-    const delay = line === "" ? 280 : 720;
+    const delay = line === "" ? 220 : 580;
     const timer = window.setTimeout(() => {
       setVisibleCount((n) => n + 1);
     }, delay);
     return () => window.clearTimeout(timer);
-  }, [visibleCount]);
+  }, [unfolded, visibleCount]);
 
   return (
     <section className="view letter-view" aria-label="야쿤이가 보낸 편지">
@@ -27,7 +34,9 @@ export default function LetterView({ onBack }: LetterViewProps) {
         ← 뒤로가기
       </button>
 
-      <article className="letter-sheet">
+      <article
+        className={`letter-sheet letter-paper ${unfolded ? "is-open" : ""}`}
+      >
         <header className="letter-header">
           <p className="brand-mark soft">야쿤이별</p>
           <h2>야쿤이가 보낸 편지</h2>
@@ -38,11 +47,7 @@ export default function LetterView({ onBack }: LetterViewProps) {
             line === "" ? (
               <div key={`gap-${index}`} className="letter-gap" />
             ) : (
-              <p
-                key={`${index}-${line}`}
-                className="letter-line"
-                style={{ animationDelay: "0s" }}
-              >
+              <p key={`${index}-${line}`} className="letter-line kid-hand">
                 {line}
               </p>
             ),
@@ -51,10 +56,7 @@ export default function LetterView({ onBack }: LetterViewProps) {
 
         {done && (
           <footer className="letter-footer fade-in-slow">
-            <p className="letter-closing">{letterClosing}</p>
-            <p className="letter-warmth">
-              당신의 하루가, 조금 더 따뜻해지기를.
-            </p>
+            <p className="letter-closing kid-hand">{letterClosing}</p>
           </footer>
         )}
       </article>

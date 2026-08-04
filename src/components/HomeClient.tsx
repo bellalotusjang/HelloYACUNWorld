@@ -3,16 +3,14 @@
 import { useCallback, useState } from "react";
 import Atmosphere from "@/components/Atmosphere";
 import FeedbackView from "@/components/FeedbackView";
-import GateConfirm from "@/components/GateConfirm";
-import GateDecline from "@/components/GateDecline";
 import Intro from "@/components/Intro";
 import MainView from "@/components/MainView";
 import MusicToggle from "@/components/MusicToggle";
 
-type Stage = "gate" | "declined" | "intro" | "main" | "feedback";
+type Stage = "intro" | "main" | "feedback";
 
 export default function HomeClient() {
-  const [stage, setStage] = useState<Stage>("gate");
+  const [stage, setStage] = useState<Stage>("intro");
   const [leaving, setLeaving] = useState(false);
 
   const transitionTo = useCallback((next: Stage) => {
@@ -24,30 +22,18 @@ export default function HomeClient() {
     }, 700);
   }, []);
 
-  const showAtmosphere = stage !== "intro" && stage !== "gate" && stage !== "declined";
-  const showMusic = stage !== "gate" && stage !== "declined";
+  const showAtmosphere = stage !== "intro";
 
   return (
     <div className={`app-shell stage-${stage} ${leaving ? "is-leaving" : "is-entering"}`}>
       {showAtmosphere && (
         <Atmosphere variant={stage === "feedback" ? "stars" : "petals"} />
       )}
-      {showMusic && (
-        <div className="top-bar">
-          <MusicToggle />
-        </div>
-      )}
+      <div className="top-bar">
+        <MusicToggle />
+      </div>
 
       <main className="stage-content">
-        {stage === "gate" && (
-          <GateConfirm
-            onConfirm={() => transitionTo("intro")}
-            onDecline={() => transitionTo("declined")}
-          />
-        )}
-        {stage === "declined" && (
-          <GateDecline onRetry={() => transitionTo("gate")} />
-        )}
         {stage === "intro" && <Intro onEnter={() => transitionTo("main")} />}
         {stage === "main" && (
           <MainView

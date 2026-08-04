@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&family=Gowun+Batang:wght@400;700&family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@300;400;500;700&family=Song+Myung&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&family=Gowun+Batang:wght@400;700&family=Hi+Melody&family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@300;400;500;700&family=Song+Myung&display=swap");
 
 :root {
   --bg-1: #f3ebe1;
@@ -20,6 +20,7 @@
   --serif: "Gowun Batang", "Noto Serif KR", Georgia, serif;
   --sans: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
   --hand: "Nanum Pen Script", "Gaegu", cursive;
+  --kid: "Hi Melody", "Gaegu", cursive;
   --display: "Gowun Batang", "Song Myung", serif;
   --title: "Gaegu", "Gowun Batang", cursive;
   --mustard: #e4b12a;
@@ -571,6 +572,55 @@ a {
   backdrop-filter: blur(8px);
 }
 
+.mailbox {
+  margin-top: 1.15rem;
+  padding: 1.2rem 1.2rem 1.25rem;
+  border-radius: 18px;
+  background: rgba(255, 251, 246, 0.72);
+  border: 1px solid rgba(74, 64, 56, 0.1);
+  box-shadow: 0 12px 28px rgba(90, 70, 50, 0.05);
+}
+
+.mailbox-label {
+  margin: 0 0 0.75rem;
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+}
+
+.mailbox-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.95rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(184, 151, 104, 0.28);
+  background: rgba(255, 250, 244, 0.9);
+  text-align: left;
+  color: var(--ink);
+  transition: background 0.35s var(--ease), transform 0.35s var(--ease);
+}
+
+.mailbox-item:hover {
+  background: rgba(255, 250, 244, 1);
+  transform: translateY(-1px);
+}
+
+.mailbox-item-title {
+  font-family: var(--serif);
+  font-size: 1.02rem;
+}
+
+.mailbox-item-meta {
+  flex-shrink: 0;
+  font-size: 0.82rem;
+  color: var(--ink-faint);
+}
+
 .diary-header {
   text-align: center;
   margin-bottom: 1.55rem;
@@ -840,9 +890,97 @@ a {
     linear-gradient(180deg, #f3ebe1 0%, #efe6db 45%, #e8ddd0 100%);
 }
 
+/* Letter event popup */
+.letter-popup-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  padding: 1.5rem;
+  background: rgba(58, 46, 36, 0.42);
+  backdrop-filter: blur(6px);
+  animation: popupFade 0.45s var(--ease);
+}
+
+@keyframes popupFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.letter-popup-card {
+  width: min(92vw, 22rem);
+  padding: 1.55rem 1.4rem 1.45rem;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 250, 244, 0.35);
+  background:
+    linear-gradient(165deg, rgba(255, 252, 247, 0.98), rgba(247, 236, 220, 0.96));
+  box-shadow: 0 22px 50px rgba(40, 28, 18, 0.28);
+  text-align: center;
+  color: var(--ink);
+  animation: popupPop 0.55s var(--ease);
+  transition: transform 0.35s var(--ease);
+}
+
+.letter-popup-card:hover {
+  transform: translateY(-2px) scale(1.01);
+}
+
+@keyframes popupPop {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.letter-popup-badge {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(201, 146, 24, 0.16);
+  color: var(--mustard-deep);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+.letter-popup-title {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.letter-popup-hint {
+  margin: 0.65rem 0 0;
+  font-size: 0.86rem;
+  color: var(--ink-faint);
+}
+
+.letter-popup-dismiss {
+  color: rgba(255, 250, 244, 0.82);
+  font-size: 0.88rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 /* Letter */
 .letter-view {
   padding-top: 5rem;
+  perspective: 1200px;
 }
 
 .back-btn {
@@ -863,6 +1001,26 @@ a {
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
   backdrop-filter: blur(10px);
+}
+
+.letter-paper {
+  transform-origin: top center;
+  transform: rotateX(72deg) scaleY(0.35);
+  opacity: 0;
+  background:
+    linear-gradient(180deg, #fffaf3 0%, #f7efe3 100%);
+  border: 1px solid rgba(184, 151, 104, 0.28);
+  box-shadow:
+    0 18px 50px rgba(90, 70, 50, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+  transition:
+    transform 0.95s var(--ease),
+    opacity 0.55s var(--ease);
+}
+
+.letter-paper.is-open {
+  transform: rotateX(0deg) scaleY(1);
+  opacity: 1;
 }
 
 .letter-header {
@@ -889,6 +1047,22 @@ a {
   line-height: 1.65;
   color: var(--ink);
   animation: lineIn 0.9s var(--ease);
+}
+
+.kid-hand {
+  font-family: var(--kid);
+  font-size: clamp(1.45rem, 5vw, 1.85rem);
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+  transform: rotate(-0.4deg);
+}
+
+.letter-line.kid-hand:nth-child(3n) {
+  transform: rotate(0.55deg);
+}
+
+.letter-line.kid-hand:nth-child(4n) {
+  transform: rotate(-0.7deg);
 }
 
 .letter-gap {
@@ -918,6 +1092,10 @@ a {
   font-family: var(--hand);
   font-size: clamp(1.4rem, 4.5vw, 1.8rem);
   color: var(--ink);
+}
+
+.letter-closing.kid-hand {
+  font-size: clamp(1.5rem, 5vw, 1.95rem);
 }
 
 .letter-warmth {
