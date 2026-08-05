@@ -29,7 +29,7 @@ export const afternoonMoments: Moment[] = [
   {
     id: "nap",
     text: "저녁되니 강아지별 날씨가 안 좋아졌어요.",
-    caption: "야외일정을 취소하고 다 같이 라이언킹을 봤답니다. 야쿤이가 피곤했나봐요. 가운데에서 잠들었어요",
+    caption: "야외일정을 취소하고 다 같이 라이언킹을 봤답니다. 야쿤이가 피곤했나봐요. 가운데에서 잠들었어요. 너무 귀엽지 않나요?ㅎㅎ",
     fallback: "잠든 야쿤이 모습 귀엽지 않나요?ㅎㅎ",
     candidates: mediaCandidates("nap"),
   },
