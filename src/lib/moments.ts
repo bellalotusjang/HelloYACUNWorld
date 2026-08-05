@@ -21,7 +21,7 @@ export const morningMoment: Moment = {
   text: "오늘은 새로운 친구들 환영식이 있었어요.",
   caption: "야외에서 다 같이 파티하며 재밌게 놀았어요. 야쿤이 많이 신났죠?",
   fallback: "새로운 친구들과 함께 파티하며 재밌게 놀았어요.",
-  candidates: mediaCandidates("flower"),
+  candidates: mediaCandidates("comfort"),
 };
 
 /** 알림장 둘째 페이지 — 오후 */
@@ -31,7 +31,7 @@ export const afternoonMoments: Moment[] = [
     text: "저녁되니 강아지별 날씨가 안 좋아졌어요.",
     caption: "야외일정을 취소하고 다 같이 라이언킹을 봤답니다. 야쿤이가 피곤했나봐요. 가운데에서 잠들었어요",
     fallback: "잠든 야쿤이 모습 귀엽지 않나요?ㅎㅎ",
-    candidates: mediaCandidates("comfort"),
+    candidates: mediaCandidates("nap"),
   },
 ];
 
