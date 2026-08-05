@@ -17,20 +17,20 @@ function mediaCandidates(id: MomentId): string[] {
 
 /** 알림장 첫 페이지 — 오전 */
 export const morningMoment: Moment = {
-  id: "flower",
-  text: "체험학습 갈 준비가 끝난 야쿤이에요. 아빠 이름이 적힌 목걸이를 하고싶다고 난리쳐서 급하게 만들어줬어요.",
-  caption: "친구들중에서 가장 빨리 준비했어요. 빨리 나가자고 보채네요. 오늘은 양몰이 체험을 하러 다녀올게요",
-  fallback: "꽃밭 사이로 커다란 꼬리가 스치듯 지나가요.",
+  id: "comfort",
+  text: "오늘은 새로운 친구들 환영식이 있었어요.",
+  caption: "야외에서 다 같이 파티하며 재밌게 놀았어요. 야쿤이 많이 신났죠?",
+  fallback: "새로운 친구들과 함께 파티하며 재밌게 놀았어요.",
   candidates: mediaCandidates("flower"),
 };
 
 /** 알림장 둘째 페이지 — 오후 */
 export const afternoonMoments: Moment[] = [
   {
-    id: "comfort",
-    text: "오늘은 야쿤이한테서 도착한 편지가 있어요.",
-    caption: "친구들이랑 놀다가도, 아빠에게 하고 싶은 말이 남아 있었나 봐요.",
-    fallback: "야쿤이가 보낸 편지가 도착했어요.",
+    id: "nap",
+    text: "저녁되니 강아지별 날씨가 안 좋아졌어요.",
+    caption: "야외일정을 취소하고 다 같이 라이언킹을 봤답니다. 야쿤이가 피곤했나봐요. 가운데에서 잠들었어요",
+    fallback: "잠든 야쿤이 모습 귀엽지 않나요?ㅎㅎ",
     candidates: mediaCandidates("comfort"),
   },
 ];
