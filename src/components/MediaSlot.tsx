@@ -130,6 +130,7 @@ export default function MediaSlot({ candidates, fallback, alt }: MediaSlotProps)
           onError={() => setBroken(true)}
           aria-label={alt}
         />
+        <span className="watermark-blur" aria-hidden="true" />
         <button
           type="button"
           className={`sound-btn ${soundOn ? "is-on" : ""}`}
