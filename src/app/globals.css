@@ -783,6 +783,15 @@ a {
   display: block;
 }
 
+/* Gemini(재미나이) 우측 하단 워터마크 가리기 */
+.media-slot.hide-watermark .media-frame {
+  width: 108%;
+  height: 108%;
+  max-width: none;
+  object-position: 42% 40%;
+  transform: none;
+}
+
 .media-slot.is-portrait .media-frame {
   object-fit: cover;
 }

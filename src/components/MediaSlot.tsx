@@ -117,7 +117,7 @@ export default function MediaSlot({ candidates, fallback, alt }: MediaSlotProps)
 
   if (isVideoPath(probe.src)) {
     return (
-      <div className={slotClass}>
+      <div className={`${slotClass} hide-watermark`}>
         <video
           key={probe.src}
           ref={videoRef}
