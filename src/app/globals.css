@@ -713,6 +713,14 @@ a {
   color: var(--ink-soft);
 }
 
+.diary-caption p {
+  margin: 0 0 0.7rem;
+}
+
+.diary-caption p:last-child {
+  margin-bottom: 0;
+}
+
 .diary-footer {
   margin-top: 1.8rem;
   padding-top: 1.35rem;

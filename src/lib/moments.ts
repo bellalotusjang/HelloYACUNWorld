@@ -18,9 +18,9 @@ function mediaCandidates(id: MomentId): string[] {
 /** 알림장 첫 페이지 — 오전 */
 export const morningMoment: Moment = {
   id: "comfort",
-  text: "인형극과 야쿤🎭",
-  caption: "오늘 오전에는 친구들과 함께 재미있는 인형극을 감상했어요. 야쿤이는 친구들과 나란히 앉아 선생님이 준비해 주신 인형극을 감상했어요. 재미있는 장면이 나올 때마다 귀를 쫑긋 세우고 무대를 바라보기도 하고, 친구들이 웃으면 함께 꼬리를 살랑살랑 흔들며 즐거워했답니다. 인형극이 끝난 뒤에는 친구들과 방금 본 이야기에 대해 도란도란 이야기를 나누며 즐거운 오전 시간을 보냈어요. 🎭🐾",
-  fallback: "인형극과 야쿤",
+  text: "털실 야쿤🧶",
+  caption: "오늘 오전에는 선생님과 함께 알록달록한 털실을 가지고 놀이했어요. 야쿤이는 여러 가지 색의 털실을 구경하다가 마음에 드는 색을 하나 골라 조심조심 만져보았답니다. 선생님과 함께 털실을 돌돌 말아 작은 공도 만들어 보고, 친구들과 서로의 털실 작품을 구경하며 즐거운 시간을 보냈어요. 🧶🐶",
+  fallback: "털실 야쿤",
   candidates: mediaCandidates("comfort"),
 };
 
@@ -28,9 +28,9 @@ export const morningMoment: Moment = {
 export const afternoonMoments: Moment[] = [
   {
     id: "rest",
-    text: "무비나잇 야쿤🎥",
-    caption: "오후에는 폭신한 쿠션에 편하게 앉아 맛있는 간식과 함께 친구들과 무비나잇 시간을 가졌어요. 야쿤이는 영화가 시작되자 친구들과 나란히 앉아 화면을 바라보며 집중해서 감상했답니다. 재미있는 장면이 나오면 친구들과 함께 즐겁게 웃기도 하고, 편안한 분위기 속에서 간식도 맛있게 먹으며 영화에 푹 빠져 있었어요. 🍿🐶",
-    fallback: "무비나잇 야쿤",
+    text: "돌고래와 은하수 수영🐬",
+    caption: "저녁에는 친구들과 함께 은하수 가득한 바다에서 수영을 즐겼어요. 바다 위로 작은 별빛들이 반짝이고, 물속에서는 귀여운 돌고래 친구들도 함께 헤엄치고 있었답니다. 야쿤이는 처음에는 신기한 듯 돌고래 친구들을 가만히 바라보다가, 돌고래가 가까이 다가오자 반갑게 인사를 나누며 함께 즐거운 시간을 보냈어요. 처음엔 수영을 무서워하다가 친구들이 재밌게 노는 거 보고 같이 풍덩 빠져들었답니다 ㅎㅎ 반짝이는 물결 사이로 돌고래와 함께 천천히 헤엄치기도 하고, 물 위에 비친 별빛을 바라보며 한참을 즐겼어요. 🌟🐬",
+    fallback: "은하수와 야콩이",
     candidates: mediaCandidates("rest"),
   },
 ];
@@ -46,6 +46,24 @@ export function pickAfternoonMoment(excludeId?: MomentId): Moment {
 
 export function isVideoPath(src: string): boolean {
   return /\.(mp4|webm|mov)(\?.*)?$/i.test(src);
+}
+
+/** 캡션을 문장 단위 단락으로 나눕니다. */
+export function captionParagraphs(caption: string): string[] {
+  return caption
+    .trim()
+    .split(/(?<=\.)\s+|(?<=ㅎㅎ)\s+/)
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .reduce<string[]>((paragraphs, part) => {
+      const emojiOnly = /^[\p{Extended_Pictographic}\uFE0F\s]+$/u.test(part);
+      if (emojiOnly && paragraphs.length > 0) {
+        paragraphs[paragraphs.length - 1] += ` ${part}`;
+        return paragraphs;
+      }
+      paragraphs.push(part);
+      return paragraphs;
+    }, []);
 }
 
 export function todayLabel(date = new Date()): string {

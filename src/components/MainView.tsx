@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import LetterView from "@/components/LetterView";
 import MediaSlot from "@/components/MediaSlot";
 import {
+  captionParagraphs,
   morningMoment,
   pickAfternoonMoment,
   todayLabel,
@@ -125,7 +126,11 @@ export default function MainView({
               alt={`야쿤이 — ${moment.text}`}
             />
 
-            <p className="diary-caption">{moment.caption}</p>
+            <div className="diary-caption">
+              {captionParagraphs(moment.caption).map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
           </section>
 
           <footer className="diary-footer">
