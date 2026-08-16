@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import LetterView from "@/components/LetterView";
 import MediaSlot from "@/components/MediaSlot";
+import { latestLetter, letters, type YakunLetter } from "@/lib/letter";
 import {
   captionParagraphs,
   morningMoment,
@@ -18,8 +19,6 @@ type MainViewProps = {
   onBack: () => void;
 };
 
-const LETTER_SEEN_KEY = "yakun-letter-seen";
-
 export default function MainView({
   onOpenFeedback,
   onBack,
@@ -27,57 +26,64 @@ export default function MainView({
   const [period, setPeriod] = useState<Period>("morning");
   const [afternoon, setAfternoon] = useState<Moment>(() => pickAfternoonMoment());
   const [showLetterPopup, setShowLetterPopup] = useState(false);
-  const [showLetter, setShowLetter] = useState(false);
-  const [letterSeen, setLetterSeen] = useState(false);
+  const [openLetter, setOpenLetter] = useState<YakunLetter | null>(null);
+  const [seenIds, setSeenIds] = useState<string[]>([]);
 
   useEffect(() => {
-    setLetterSeen(window.localStorage.getItem(LETTER_SEEN_KEY) === "1");
+    const stored = letters
+      .filter((letter) => window.localStorage.getItem(letter.seenKey) === "1")
+      .map((letter) => letter.id);
+    setSeenIds(stored);
+
+    if (window.localStorage.getItem(latestLetter.seenKey) !== "1") {
+      setShowLetterPopup(true);
+    }
   }, []);
 
   const moment = period === "morning" ? morningMoment : afternoon;
   const label = period === "morning" ? "오전" : "오후";
+  const latestSeen = seenIds.includes(latestLetter.id);
+  const mailboxLetters = letters.filter(
+    (letter) => letter.id !== latestLetter.id || seenIds.includes(letter.id),
+  );
 
   function goAfternoon() {
     setAfternoon((current) => pickAfternoonMoment(current.id));
     setPeriod("afternoon");
-    if (!letterSeen) {
-      setShowLetterPopup(true);
-    }
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function goMorning() {
     setPeriod("morning");
-    setShowLetterPopup(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function openLetter() {
+  function readLetter(letter: YakunLetter) {
     setShowLetterPopup(false);
-    setShowLetter(true);
+    setOpenLetter(letter);
   }
 
   function closeLetter() {
-    if (!letterSeen) {
-      setLetterSeen(true);
-      window.localStorage.setItem(LETTER_SEEN_KEY, "1");
+    if (openLetter && !seenIds.includes(openLetter.id)) {
+      window.localStorage.setItem(openLetter.seenKey, "1");
+      setSeenIds((current) => [...current, openLetter.id]);
     }
-    setShowLetter(false);
+    setOpenLetter(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  if (showLetter) {
-    return <LetterView onBack={closeLetter} />;
+  if (openLetter) {
+    return <LetterView letter={openLetter} onBack={closeLetter} />;
   }
 
   return (
     <section className="main-view" aria-label="야쿤이의 하루 알림장">
-      {showLetterPopup && period === "afternoon" && !letterSeen && (
+      {showLetterPopup && !latestSeen && (
         <div className="letter-popup-layer" role="dialog" aria-modal="true" aria-labelledby="letter-popup-title">
           <button
             type="button"
             className="letter-popup-card"
-            onClick={openLetter}
+            onClick={() => readLetter(latestLetter)}
           >
             <span className="letter-popup-badge" aria-hidden="true">
               이벤트
@@ -148,25 +154,9 @@ export default function MainView({
                 </button>
               </>
             ) : (
-              <>
-                {!letterSeen && (
-                  <>
-                    <p className="hint">오늘은 야쿤이한테서 도착한 편지가 있어요</p>
-                    <button
-                      type="button"
-                      className="paw-btn"
-                      onClick={openLetter}
-                      aria-label="야쿤이 편지 열어보기"
-                    >
-                      <PawIcon />
-                      <span>편지 열어보기</span>
-                    </button>
-                  </>
-                )}
-                <button type="button" className="ghost-btn" onClick={goMorning}>
-                  오전 알림장으로
-                </button>
-              </>
+              <button type="button" className="ghost-btn" onClick={goMorning}>
+                오전 알림장으로
+              </button>
             )}
 
             <div className="action-links">
@@ -181,17 +171,20 @@ export default function MainView({
           </footer>
         </article>
 
-        {letterSeen && (
+        {mailboxLetters.length > 0 && (
           <section className="mailbox fade-in-slow" aria-label="편지함">
             <p className="mailbox-label">편지함</p>
-            <button
-              type="button"
-              className="mailbox-item"
-              onClick={openLetter}
-            >
-              <span className="mailbox-item-title">야쿤이한테서 온 편지</span>
-              <span className="mailbox-item-meta">다시 읽기</span>
-            </button>
+            {mailboxLetters.map((letter) => (
+              <button
+                key={letter.id}
+                type="button"
+                className="mailbox-item"
+                onClick={() => readLetter(letter)}
+              >
+                <span className="mailbox-item-title">{letter.mailboxTitle}</span>
+                <span className="mailbox-item-meta">다시 읽기</span>
+              </button>
+            ))}
           </section>
         )}
       </div>
