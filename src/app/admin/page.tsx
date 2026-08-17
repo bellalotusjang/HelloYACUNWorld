@@ -1,14 +1,23 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import type { FeedbackRow } from "@/lib/supabase";
+import type { FeedbackRow, VisitRow, VisitStats } from "@/lib/supabase";
 
 const STORAGE_KEY = "yakun-admin-password";
+
+type AdminTab = "visits" | "feedback";
 
 export default function AdminPage() {
   const [password, setPassword] = useState("");
   const [authed, setAuthed] = useState(false);
-  const [items, setItems] = useState<FeedbackRow[]>([]);
+  const [tab, setTab] = useState<AdminTab>("visits");
+  const [feedback, setFeedback] = useState<FeedbackRow[]>([]);
+  const [visits, setVisits] = useState<VisitRow[]>([]);
+  const [visitStats, setVisitStats] = useState<VisitStats>({
+    total: 0,
+    uniqueVisitors: 0,
+    today: 0,
+  });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -16,25 +25,46 @@ export default function AdminPage() {
     const saved = sessionStorage.getItem(STORAGE_KEY);
     if (saved) {
       setPassword(saved);
-      void loadItems(saved);
+      void loadAll(saved);
     }
   }, []);
 
-  async function loadItems(pwd: string) {
+  async function loadAll(pwd: string) {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/admin/feedback", {
-        headers: { "x-admin-password": pwd },
-      });
-      const data = (await res.json()) as { items?: FeedbackRow[]; error?: string };
-      if (!res.ok) {
+      const headers = { "x-admin-password": pwd };
+      const [feedbackRes, visitsRes] = await Promise.all([
+        fetch("/api/admin/feedback", { headers }),
+        fetch("/api/admin/visits", { headers }),
+      ]);
+
+      const feedbackData = (await feedbackRes.json()) as {
+        items?: FeedbackRow[];
+        error?: string;
+      };
+      const visitsData = (await visitsRes.json()) as {
+        items?: VisitRow[];
+        stats?: VisitStats;
+        error?: string;
+      };
+
+      if (!feedbackRes.ok || !visitsRes.ok) {
         setAuthed(false);
         sessionStorage.removeItem(STORAGE_KEY);
-        setError(data.error ?? "로그인에 실패했습니다.");
+        setError(
+          feedbackData.error ??
+            visitsData.error ??
+            "로그인에 실패했습니다.",
+        );
         return;
       }
-      setItems(data.items ?? []);
+
+      setFeedback(feedbackData.items ?? []);
+      setVisits(visitsData.items ?? []);
+      setVisitStats(
+        visitsData.stats ?? { total: 0, uniqueVisitors: 0, today: 0 },
+      );
       setAuthed(true);
       sessionStorage.setItem(STORAGE_KEY, pwd);
     } catch {
@@ -47,14 +77,16 @@ export default function AdminPage() {
 
   async function handleLogin(event: FormEvent) {
     event.preventDefault();
-    await loadItems(password.trim());
+    await loadAll(password.trim());
   }
 
   function handleLogout() {
     sessionStorage.removeItem(STORAGE_KEY);
     setAuthed(false);
     setPassword("");
-    setItems([]);
+    setFeedback([]);
+    setVisits([]);
+    setVisitStats({ total: 0, uniqueVisitors: 0, today: 0 });
   }
 
   return (
@@ -62,8 +94,8 @@ export default function AdminPage() {
       <div className="admin-wrap">
         <header className="admin-header">
           <p className="admin-brand">야쿤이별</p>
-          <h1>관리자 · 의견함</h1>
-          <p className="admin-sub">남겨진 문의를 확인할 수 있어요.</p>
+          <h1>관리자</h1>
+          <p className="admin-sub">방문 기록과 의견함은 비밀번호 친 뒤에만 보여요.</p>
         </header>
 
         {!authed ? (
@@ -86,12 +118,27 @@ export default function AdminPage() {
         ) : (
           <section className="admin-list">
             <div className="admin-toolbar">
-              <p>{items.length}건</p>
+              <div className="admin-tabs">
+                <button
+                  type="button"
+                  className={`admin-tab ${tab === "visits" ? "is-active" : ""}`}
+                  onClick={() => setTab("visits")}
+                >
+                  방문
+                </button>
+                <button
+                  type="button"
+                  className={`admin-tab ${tab === "feedback" ? "is-active" : ""}`}
+                  onClick={() => setTab("feedback")}
+                >
+                  의견함
+                </button>
+              </div>
               <div className="admin-toolbar-actions">
                 <button
                   type="button"
                   className="ghost-btn"
-                  onClick={() => loadItems(password)}
+                  onClick={() => loadAll(password)}
                   disabled={loading}
                 >
                   새로고침
@@ -104,24 +151,69 @@ export default function AdminPage() {
 
             {loading && <p className="admin-empty">불러오는 중…</p>}
 
-            {!loading && items.length === 0 && (
-              <p className="admin-empty">아직 도착한 문의가 없어요.</p>
+            {!loading && tab === "visits" && (
+              <>
+                <div className="admin-stats">
+                  <div className="admin-stat">
+                    <strong>{visitStats.today}</strong>
+                    <span>오늘</span>
+                  </div>
+                  <div className="admin-stat">
+                    <strong>{visitStats.uniqueVisitors}</strong>
+                    <span>방문자(최근)</span>
+                  </div>
+                  <div className="admin-stat">
+                    <strong>{visitStats.total}</strong>
+                    <span>기록 수</span>
+                  </div>
+                </div>
+
+                {visits.length === 0 ? (
+                  <p className="admin-empty">아직 방문 기록이 없어요.</p>
+                ) : (
+                  <ul className="admin-cards">
+                    {visits.map((item) => (
+                      <li key={item.id} className="admin-card">
+                        <div className="admin-card-meta">
+                          <span>방문</span>
+                          <time dateTime={item.created_at}>
+                            {new Date(item.created_at).toLocaleString("ko-KR")}
+                          </time>
+                        </div>
+                        <p className="admin-card-topic">
+                          방문자 {item.visitor_id.slice(0, 8)}…
+                        </p>
+                        <p className="admin-card-message">{item.path}</p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </>
             )}
 
-            <ul className="admin-cards">
-              {items.map((item) => (
-                <li key={item.id} className="admin-card">
-                  <div className="admin-card-meta">
-                    <span>{item.name}</span>
-                    <time dateTime={item.created_at}>
-                      {new Date(item.created_at).toLocaleString("ko-KR")}
-                    </time>
-                  </div>
-                  <p className="admin-card-topic">{item.topic}</p>
-                  <p className="admin-card-message">{item.message}</p>
-                </li>
-              ))}
-            </ul>
+            {!loading && tab === "feedback" && (
+              <>
+                <p className="admin-section-count">{feedback.length}건</p>
+                {feedback.length === 0 ? (
+                  <p className="admin-empty">아직 도착한 문의가 없어요.</p>
+                ) : (
+                  <ul className="admin-cards">
+                    {feedback.map((item) => (
+                      <li key={item.id} className="admin-card">
+                        <div className="admin-card-meta">
+                          <span>{item.name}</span>
+                          <time dateTime={item.created_at}>
+                            {new Date(item.created_at).toLocaleString("ko-KR")}
+                          </time>
+                        </div>
+                        <p className="admin-card-topic">{item.topic}</p>
+                        <p className="admin-card-message">{item.message}</p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </>
+            )}
           </section>
         )}
       </div>

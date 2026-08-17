@@ -1362,11 +1362,69 @@ a {
   margin-bottom: 1rem;
   color: var(--ink-soft);
   font-size: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 0.35rem;
+  padding: 0.2rem;
+  border-radius: 999px;
+  background: rgba(74, 64, 56, 0.06);
+}
+
+.admin-tab {
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+}
+
+.admin-tab.is-active {
+  background: rgba(255, 250, 244, 0.95);
+  color: var(--ink);
+  box-shadow: 0 4px 12px rgba(90, 70, 50, 0.08);
 }
 
 .admin-toolbar-actions {
   display: flex;
   gap: 0.5rem;
+}
+
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin-bottom: 1.1rem;
+}
+
+.admin-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.85rem 0.7rem;
+  border-radius: 14px;
+  background: rgba(255, 250, 244, 0.78);
+  border: 1px solid rgba(74, 64, 56, 0.08);
+  text-align: center;
+}
+
+.admin-stat strong {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  font-weight: 400;
+  color: var(--ink);
+}
+
+.admin-stat span {
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+}
+
+.admin-section-count {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  color: var(--ink-faint);
 }
 
 .admin-empty {

@@ -8,6 +8,19 @@ export type FeedbackRow = {
   created_at: string;
 };
 
+export type VisitRow = {
+  id: string;
+  visitor_id: string;
+  path: string;
+  created_at: string;
+};
+
+export type VisitStats = {
+  total: number;
+  uniqueVisitors: number;
+  today: number;
+};
+
 function requiredEnv(name: string): string {
   const value = process.env[name];
   if (!value) {

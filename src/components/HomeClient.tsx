@@ -6,6 +6,7 @@ import FeedbackView from "@/components/FeedbackView";
 import Intro from "@/components/Intro";
 import MainView from "@/components/MainView";
 import MusicToggle from "@/components/MusicToggle";
+import VisitBeacon from "@/components/VisitBeacon";
 
 type Stage = "intro" | "main" | "feedback";
 
@@ -26,6 +27,7 @@ export default function HomeClient() {
 
   return (
     <div className={`app-shell stage-${stage} ${leaving ? "is-leaving" : "is-entering"}`}>
+      <VisitBeacon />
       {showAtmosphere && (
         <Atmosphere variant={stage === "feedback" ? "stars" : "petals"} />
       )}
